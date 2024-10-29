@@ -10,11 +10,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -70,18 +77,54 @@ fun DataStoreDemo(modifier: Modifier) {
     val appPrefs = store.appPreferenceFlow.collectAsState(AppPreferences())
     val coroutineScope = rememberCoroutineScope()
 
+    var userName by remember { mutableStateOf("") }
+    var highScore by remember { mutableStateOf("0") }
+    var switchDarkMode by remember { mutableStateOf(false) }
+
     Column (modifier = Modifier.padding(50.dp)) {
         Text("Values = ${appPrefs.value.userName}, " +
                 "${appPrefs.value.highScore}, ${appPrefs.value.darkMode}")
+
+        OutlinedTextField(
+            value = userName,
+            onValueChange = {userName = it},
+            label = { Text("Enter username")}
+        )
+        OutlinedTextField(
+            value = highScore,
+            onValueChange = {highScore = it},
+            label = { Text("Enter high score!")}
+        )
+        Switch(
+            checked = switchDarkMode,
+            onCheckedChange = {switchDarkMode = it}
+        )
+
         Button(onClick = {
             coroutineScope.launch {
-                store.saveUsername("flygirl")
-                store.saveHighScore(100)
-                store.saveDarkMode(true)
+                store.saveUsername(userName)
+                store.saveHighScore(highScore.toInt())
+                store.saveDarkMode(switchDarkMode)
             }
 
         }) {
-            Text("Save Values")
+            Text("Save username")
+        }
+        Button(onClick = {
+            coroutineScope.launch {
+                store.saveHighScore(highScore.toInt())
+            }
+
+        }) {
+            Text("Save highscore")
+        }
+        Button(onClick = {
+            coroutineScope.launch {
+                store.saveHighScore(highScore.toInt())
+            }
+
+        }) {
+            Text("Save darkmode")
         }
     }
 }
