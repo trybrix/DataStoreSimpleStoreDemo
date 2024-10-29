@@ -12,7 +12,11 @@ import kotlinx.coroutines.flow.map
 import java.io.FileOutputStream
 import java.io.PrintWriter
 
-class AppStorage ( private val context: Context) {
+class AppStorage (
+    private val context: Context
+) {
+    //singleton - can create one instance of an object - used often in programming - boiler plare
+    //companion object can&cannot have a name - no name - referring to AppStorage
     companion object{
         private val Context.dataStore by
         preferencesDataStore(name = "app_preferences")
@@ -24,7 +28,11 @@ class AppStorage ( private val context: Context) {
         }
     }
 
+    //class 311 -flow is the stream(java) of data
+        //we have hte usernam, [async], highscore then the darkmode
+        //can deal data 2 ways, live data or flow
     val appPreferenceFlow: Flow<AppPreferences> = context.dataStore.data
+        //map -
         .map { preferences ->
             val userName = preferences[PreferencesKeys.USERNAME] ?: ""
             val highScore = preferences[PreferencesKeys.HIGHSCORE] ?: 0
@@ -32,9 +40,20 @@ class AppStorage ( private val context: Context) {
             AppPreferences(userName, highScore, darkMode)
         }
 
+    //because we are dealing with multi threading
     suspend fun saveUsername(username: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.USERNAME] = username
+        }
+    }
+    suspend fun saveHighScore(highscore: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.HIGHSCORE] = highscore
+        }
+    }
+    suspend fun saveDarkMode( darkmode: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.DARK_MODE] = darkmode
         }
     }
 
